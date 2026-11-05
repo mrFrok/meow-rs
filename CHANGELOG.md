@@ -8,6 +8,18 @@ the canonical, in-repo source a release is cut from.
 
 ## [Unreleased]
 
+### Changed
+
+- **gRPC and XHTTP (stream-one) tunnels share one HTTP/2 connection per
+  proxy**, as mihomo and Xray clients do, instead of a TCP + TLS/REALITY
+  handshake per tunnel (each REALITY handshake costs the server a `dest`
+  round trip). Only user dials straight to the server share it: a
+  `dialer-proxy` chain, a relay hop and internal probes keep their own
+  connection. A connection at the peer's concurrent-stream limit is passed
+  over at once; an idle one is PINGed after 30 s and retired after 30 min;
+  a network change (`reset_sessions`) drops it, and a reload builds new
+  adapters with none.
+
 ### Added
 
 - **DNS over QUIC (`quic://`)**: RFC 9250 on `quiche` (the vendored BoringSSL
